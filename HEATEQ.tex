@@ -1,0 +1,229 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{physics}
+
+% Formatting preferences
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\setlength{\parindent}{0pt} % Remove indentation
+\setlength{\parskip}{1em}   % Add space between paragraphs
+
+\title{\textbf{Modelling the Heat Equation w/ Boundary Conditions, Initial Condition}}
+\author{Hassan Akhter, Humayun Sheikh}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction: Understanding the Heat Equation}
+We want to mathematically understand and model, how the heat distribution at any given point changes over time in any object, and how that change affects other points in that distribution. For the simplest and easiest to understand model, Lets Consider:
+
+Imagine a piece of metal, specifically a rod, situated along the $x$-axis. We wish to understand how heat is distributed across this metal and, more importantly, how that distribution changes over time.
+
+Let $T(x,t)$ represent the temperature at a specific position $x$ at a specific time $t$. Heat naturally flows from hotter regions to cooler regions. If we bring two rods of different temperatures into contact, heat will flow until the temperature equalizes.
+
+The question we want to answer via mathematical modeling is: \textit{What will the temperature be at each point in time?}
+
+To answer this, we need the Heat Equation, a Partial Differential Equation (PDE) describing how the distribution of heat evolves:
+\begin{equation}
+    \frac{\partial T}{\partial t} = \alpha \nabla^2 T
+\end{equation}
+In one dimension (along a rod), this simplifies to:
+\begin{equation}
+    \frac{\partial T}{\partial t} = \alpha \frac{\partial^2 T}{\partial x^2}
+\end{equation}
+where $\alpha$ is the thermal diffusivity constant.
+
+\section{Mathematical Modeling}
+However, where does this equation come from and how can we intuitively understand what it describes? as such, it is helpful to imagine the rod as a discrete set of points along the x-axis.
+
+The Temperate is a function of this rod, so $T(x)$, but the temperature is also a changing over time, so what we are looking at is essentially a 3D $T(x,t)$ Graph.
+
+Naturally we have 2 rates of changes, $\frac{\partial T}{\partial t}$, and $\frac{\partial T}{\partial x}$ describing temperature change with respect to time or the spatial dimension x. However the change with respect to time depends on how the function changes with respect to x. $\frac{\partial T}{\partial t} = k\frac{\partial^2 T}{\partial x^2}$.
+
+For our discrete example, lets look at three points on the rod: $x_1, x_2, x_3$, with corresponding temperatures $T_1, T_2, T_3$.
+\begin{itemize}
+    \item If the neighbors ($T_1$ and $T_3$) are generally hotter than the middle point ($T_2$), then $T_2$ should heat up.
+    \item If the neighbors are cooler, $T_2$ should cool down.
+\end{itemize}
+
+We can model the rate of change of temperature at $T_2$ based on the average temperature of its neighbors:
+\begin{equation}
+    \frac{dT_2}{dt} \propto \left( \frac{T_1 + T_3}{2} - T_2 \right)
+\end{equation}
+This equation states that the rate of change depends on the difference between the surrounding average and the current value.
+
+\subsection{Difference of Differences}
+We can rewrite the proportionality by re-arranges:
+\begin{equation}
+    \frac{dT_2}{dt} = \alpha \left( \frac{T_1 + T_3 - 2T_2}{2} \right)
+\end{equation}
+We can rearrange to see the relationship between differences:
+\begin{align*}
+    [T_1 + T_3 - 2T_2] &= (T_3 - T_2) - (T_2 - T_1) \\
+    &= \Delta T_2 - \Delta T_1
+\end{align*}
+
+\begin{itemize}
+    \item If $\Delta T_2 - \Delta T_1 > 0$, the function curves upward (concave up), and $T_2$ heats up.
+    \item If $\Delta T_2 - \Delta T_1 < 0$, the function curves downward (concave down), and $T_2$ cools down.
+\end{itemize}
+
+Here, $\Delta T$ represents the slope(first derivative). Therefore, the expression $\Delta T_2 - \Delta T_1$ represents the difference of differences $\Delta \Delta T_1$.
+$$ \frac{dT_2}{dt} = \frac{\alpha}{2} \Delta \Delta T_1 $$
+
+\subsection{Continuous Model}
+When we move from a discrete number of particles to a continuous rod, we shrink the distance between points to a very small ($\Delta x$) approaching zero, Therefore instead of taking the temperature averages between 2 adjacent fixed points (x1,x2), we are describing how any arbitrary point changes in temperature with respect to the infinitely small dx's adjacent to it.
+\begin{itemize}
+    \item The discrete difference $\Delta T$ becomes the derivative $\frac{\partial T}{\partial x}$.
+    \item The difference of differences $\Delta \Delta T$ becomes the second derivative $\frac{\partial^2 T}{\partial x^2}$.
+\end{itemize}
+Thus, this transforms into the 1D Heat Equation: 
+$$\frac{dT_2}{dt} = \frac{\alpha}{2} \Delta \Delta T_1$$
+\begin{equation}
+    \equiv \frac{\partial T}{\partial t}(x,t) = \alpha \frac{\partial^2 T}{\partial x^2}(x,t)
+\end{equation}
+Generalized to all points, we have now built up an equation which tells us that the rate at which the temperature changes over time depends on the second derivative of that temperature at that point with respect to space.
+
+\section{Modeling the Constraints}
+Now that we have built up an equation, we need a function which describes this temperature distribution and satisfies the following Constraints.
+\begin{itemize}
+    \item The PDE $\frac{\partial T}{\partial t}(x,t) = \alpha \frac{\partial^2 T}{\partial x^2}(x,t)$
+    \item Boundary Condition(Isolated Rod): $\frac{\partial T}{\partial x}(0,t) = \frac{\partial T}{\partial x}(L,t) = 0$.
+\end{itemize}
+Lets consider a function $T(x,0) = \sin(x)$ which describes the temperature function at t(0). 
+$$ \frac{\partial^2 T}{\partial x^2} = -ksin(x) $$
+$$\frac{\partial T}{\partial t} = -k \cdot T(x,0) $$
+
+As such we are looking at the function whose rate of change depends upon itself $\frac{\partial T}{\partial t}(x, t) = -k\cdot T(x,t)$, we can reason that this might have an exponential component.
+
+This is similar to the Newtons Law of Cooling which is a first order ODE, solved by $T = Ce^{-kt}$ where C is the initial Temperature.
+
+As such extrapolating this same logic for our PDE, we get the equation:
+\begin{equation}
+    T(x,t) = \sin(x)e^{-kt}
+\end{equation}
+This satisfies The PDE Constraint (1)
+\[ \frac{\partial T}{\partial t} = -k \sin(x) e^{-kt} \]
+\[ \frac{\partial^2 T}{\partial x^2} = -\sin(x) e^{-kt} \]
+$$ \frac{\partial T}{\partial t} = k \frac{\partial^2 T}{\partial x^2} $$
+
+where $e^{-kt}$ describes the exponential decay with respect to time.
+
+Substituting these back into the original heat equation $\frac{\partial T}{\partial t} = \alpha \frac{\partial^2 T}{\partial x^2}$:
+\[ -k \sin(x) e^{-kt} = k (-\sin(x) e^{-kt}) \]
+
+\subsection{Modeling the Boundary Condition}
+We now have an equation that satisfies the PDE, since we are considering a rod of finite lenght $L$ in vacuum, there is no heat transfer outside the rod by any means and as such, our function T(x,t) must also satisfy this Boundary Condition of an Insulated Rod. i.e The slope will be flat at the ends.
+\begin{equation}
+\frac{\partial T}{\partial x}(0,t) = \frac{\partial T}{\partial x}(L,t) = 0
+\end{equation}
+Because the derivative of $\sin(x)$ is $\cos(x)$ (which is not zero at $x=0$), we need to switch to a cosine function $\cos(x)e^{-kt}$ which will also satisfies (1).
+
+To make the function flat at the end, we need to introduce a frequency such that the $\frac{\partial T}{\partial x} = 0$ at the ends.
+
+The lowest frequency where the function satisfies the boundary condition is at the first harmonic $\frac{\pi}{L}$, all subsequent harmonics also satisfy this boundary condition.
+
+Therefore, $T(x,0) = \cos(\omega x)$ where $\omega = \frac{n\pi}{L} \ \forall n \in N$
+
+Let the temperature function be:
+$$ T(x) = \cos\left(\frac{n\pi x}{L}\right) $$
+
+Now the $\frac{\partial^2 T}{\partial x^2}$ becomes:
+$$ \frac{\partial T}{\partial x} = -\left(\frac{n\pi}{L}\right) \sin\left(\frac{n\pi x}{L}\right)$$
+$$ \frac{\partial^2 T}{\partial x^2} = -\left(\frac{n\pi}{L}\right)^2 \cos\left(\frac{n\pi x}{L}\right)$$
+$$ \frac{\partial^2 T}{\partial x^2} = -\left(\frac{n\pi}{L}\right)^2 T(x,t) $$
+
+Since we have introduced omega in the spatial aspect, we must also balance the temporal part of the equation by introducing $\left(\frac{n\pi}{L}\right)^2$ such that:
+
+$$ \frac{\partial T}{\partial t} = -\alpha \left(\frac{n\pi}{L}\right)^2 \cos\left(\frac{n\pi x}{L}\right)T(t)$$
+Therefore, T(x,t) which satisfies (1) and (2) becomes:
+$$T(x,t) \equiv \cos(\frac{n\pi x}{L})e^{-k(\frac{n\pi}{L})^2t}$$
+$$ \frac{\partial T}{\partial t} = -k \left(\frac{n\pi}{L}\right)^2 T(x,t) $$
+
+As such,
+$\frac{\partial T}{\partial t} = \alpha \frac{\partial^2 T}{\partial x^2}$:
+\begin{equation}
+-k \left(\frac{n\pi}{L}\right)^2 T(x,t) = k \cdot \left[ -\left(\frac{n\pi}{L}\right)^2 T(x,t) \right]
+\end{equation}
+
+\section{Linearity, Superposition \&\ Fourier Series Solution}
+Therefore, now we have an infinite set of functions T(x,t) that satisfy both (1) The PDE, and (2) The boundary Condition:
+\begin{equation}
+T(x,t) \equiv \cos(\frac{n\pi x}{L})e^{-k(\frac{n\pi}{L})^2t} ,\ \forall n \in N.
+\end{equation}
+
+The Heat Equation is also linear. This means that if $T_1$ and $T_2$ are solutions, then their sum $T_1 + T_2$ = $T_3$ is also a solution. As such we can imagine that we can combine select solutions from this infinite set to create a new solution that will satisfy a specific Initial Condition. \\
+Therefore, the most general solution is an infinite sum (Fourier Series) of all possible solutions:
+\begin{equation}
+    T(x,t) = \sum_{n=0}^{\infty} A_n \cos\left(\frac{n\pi x}{L}\right) e^{-\alpha \left(\frac{n\pi}{L}\right)^2 t}
+\end{equation}
+Here, $A_n$ are coefficients determined by the initial temperature distribution of the rod at $t=0$.
+
+
+\section{Describing an Initial Condition}
+
+Now we consider that we just joined 2 rods of Length(L/2) such that the final lenght is L
+
+The initial temperature distribution $T(x,0) = f(x)$ is defined as:
+\begin{equation}
+    f(x) = \begin{cases} 
+    1 & 0 \le x < L/2 \\
+    -1 & L/2 \le x \le L 
+    \end{cases}
+\end{equation}
+
+\subsection{A really beginner understanding of the Fourier Series}
+To wrap it up, I'll describe really basically and badly how we can get a solution for this specific Initial Condition, however the core logic of the Fourier Transform remains the same for any other Initial Condition.
+
+To find the amplitudes $A_n$, we use Fourier analysis to sift through the infinite solution. We know that this step function f(x) is solved by the general solution, we need to sift through the infinite solutions such that we obtain the initial starting condition of our step function. \\
+
+To do this we multiply an arbitrary frequency with general solution:
+\begin{equation}
+f(x) \cos\left(\frac{m\pi x}{L}\right) = \frac{A_0}{2} \cos\left(\frac{m\pi x}{L}\right) + \sum_{n=1}^{\infty} A_n \cos\left(\frac{n\pi x}{L}\right) \cos\left(\frac{m\pi x}{L}\right)
+\end{equation}
+As we integrate this over the length of the Rod, the frequencies where $n \neq m$ come out to be 0, and only the frequencies that match survive, integrating over them we get L/2.
+$= \int_{0}^{L} f(x) \cos\left(\frac{n\pi x}{L}\right) dx = \frac{L}{2} A_n$:
+
+Therefore, to find the set of $A_n$ we can solve this integral:
+\begin{equation}
+    A_n = \frac{2}{L} \int_{0}^{L} f(x) \cos\left(\frac{n\pi x}{L}\right) dx
+\end{equation}
+We will split the integral: 0 to L/2 with $f(x) = 1$, and then from L/2 to L with $f(x) = -1$
+
+\begin{equation}
+    A_n = \frac{2}{L} \left[ \int_{0}^{L/2} (1) \cos\left(\frac{n\pi x}{L}\right) dx + \int_{L/2}^{L} (-1) \cos\left(\frac{n\pi x}{L}\right) dx \right]
+\end{equation}
+
+Solving this, we get:
+\begin{equation}
+    A_n = \frac{4}{n\pi} \sin\left(\frac{n\pi}{2}\right)
+\end{equation}
+
+\begin{equation}   
+T(x,t) = \frac{4}{\pi}\sum_{n=1,3,5...}^{\infty} \frac{1}{n}\sin(\frac{n\pi}{2}) \cos\left(\frac{n\pi x}{L}\right) e^{-\alpha \left(\frac{n\pi}{L}\right)^2 t}
+\end{equation}
+
+We can reason that as n increases, the frequencies get bigger but as per their exponentially decap function they also die out faster and as t gets biggers, the distribution gets more and more uniform.
+
+Therefore, We have somewhat achieved our Goal of Modeling the heat equation and describing its behaviour in 1 dimension, modelling the PDE, Boundary conditions, Linearity of the equation and describing the solution for a basic initial condition using a very basic understanding of the Fourier series.
+
+\section{References}
+Videos from 3Blue1Brown: \\
+But what is a partial differential equation? | DE2 \\
+Solving the heat equation | DE3 \\
+But what is a Fourier series? From heat flow to drawing with circles | DE4 \\
+
+Everything was sourced from here when making personal notes on paper. \\
+Newton's Law of Cooling taken from a PHY101 lab Last Semester: Determining the Co-efficient of convective heat transfer. \\
+
+Complete notes available here, mostly just copied them as is onto LATEX: \\ https://github.com/hAkhter89/MATH202-HEATEQ \\
+
+
+
+\end{document}
